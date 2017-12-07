@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.2)
 
-project(cmake_ci VERSION 0.0.${TRAVIS_BUILD_NUMBER})
+project(cmake_ci VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
 add_executable(${PROJECT_NAME} "main.cpp")
 
 add_library(hello "hello.cpp")
