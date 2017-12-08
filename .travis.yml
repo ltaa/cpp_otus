@@ -13,6 +13,7 @@ deploy:
   on:
     all_branches: true
   script:
+  - echo $BINTRAYKEY
   - curl -T cmake_ci-0.0.${TRAVIS_BUILD_NUMBER}-Linux.deb -ultaa:${BINTRAYKEY}
     "https://api.bintray.com/content/ltaa/hello/otus_hello/0.0.${TRAVIS_BUILD_NUMBER}/cmake_ci-0.0.${TRAVIS_BUILD_NUMBER}-Linux.deb;deb_distribution=trusty;deb_component=main;deb_architecture=amd64;publish=1"
 dd:
