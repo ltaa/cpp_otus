@@ -8,12 +8,12 @@ script:
 - cmake --build . --target test
 - cmake --build . --target package
 deploy:
-  env:
-    - secure: "sBZEcRWw7cTcPXzwIWj9TAZZicJhO/7sEVM2JAN2glm0+L2tL0BKfqiWq2MVv9AEv+F7DYdBRyf9DqFGFELaUPslp0gG8hRzVwM4KQu2bnqEyJpOU8haWOhb6Bg9QxlHFutvHH/T/Ifbz2NWfpzVWMimMA8XEMs4OKbv/ME5C1yIcIx5AKWTDfiXXQwzqSb5sLE0FkpZPee7m6FxrDpJLm9KZOxQKZhwj3F/Cnwptvvk/62t6nHeHhT3GGZkn5ywhBdUJloIckqWAQSqcQknko2FHY1V0ouqeiRJlqedGJG/4SGrOJZEmE64oRbYWgSnCxWqw/w4YswCNnxHCSCCY+7vpzyhcfzywzznMVunefT2NXxxm6HINjF5y9vV4LLEXPmyQ8InJVcPpxqLDVQiAF79D2feMLkJDqMIRXrSaB37XzVYZOEPSeLz03P5eqgsdmrwS6sWz7yJZ1uJUBA3KJIucDaMZTz+k4mRQALIZBCKMzdsnKMVXVu2Lj46P4b+d7d73ILjBF43ieOFoV1VDayszJxtXguIyqz/uC7TpTWbxOktoP1WHpXE+hrtivUgcfnj1J58hyHnikZonTEoJ1VdpBdHL5G4O2jW8OHMONbHa+s8xztiVEg/q9QD6p6PTzj9553r3z9pGq7BAawseZzR3a6FYb7i6rQqC8PSZW0="
   provider: script
   skip_cleanup: true
   on:
     all_branches: true
   script:
-  - curl -T cmake_ci-0.0.${TRAVIS_BUILD_NUMBER}-Linux.deb -ultaa:${BINTRAYKEY}
-    "https://api.bintray.com/content/ltaa/hello/otus_hello/0.0.${TRAVIS_BUILD_NUMBER}/cmake_ci-0.0.${TRAVIS_BUILD_NUMBER}-Linux.deb;deb_distribution=trusty;deb_component=main;deb_architecture=amd64;publish=1"
+  - curl -T cmake_ci-0.0.${TRAVIS_BUILD_NUMBER}-Linux.deb -ultaa:${BINTRAYKEY} "https://api.bintray.com/content/ltaa/hello/otus_hello/0.0.${TRAVIS_BUILD_NUMBER}/cmake_ci-0.0.${TRAVIS_BUILD_NUMBER}-Linux.deb;deb_distribution=trusty;deb_component=main;deb_architecture=amd64;publish=1"
+env:
+  global:
+    secure: wGGqfZhlFBrm0dxzZyYQwxAgLT20CqEwdjJcKAJGbhoSBqPOEFb37LyBJyCcjTHE+So1rBD6kM2RGODndbXBd/cRbEX02NFeIrOBYj6bCYFwKg7Bp/LYxbbT55X2LDsGm3/gd00bEnBqAXswwDMKpdxCTXdIGEljfy24mkchP8BG9ZUhBKetSMJDhOZrdgPZBNoUSD03g4w/t3YG0RKTiUOxMke2Wf8//xuMAEc7m2H0RbHF2TR20DuXt6er7M0gsvbNi2rvv7w6JKMinkJdNLwRawetqFORLKauoULgnxQiMLOWDfq8IGpB+OChWeLdVvxPwGbpx26LIP5FUk2Wco/gzSo/43dq8M15pJk3hBZmklqvbN+L4vnzY6vQaCryf5It/FvHdZUZq4CHdWScC3W2n99nBaSk1TEiKBN2mFTX1u5bh+vcHsW6TOvaZp/WQMKH7xdsQohABsByVEnsMKZz9BWRz+/Y5PMBM0RIkKn8hOKAPmi3lGphkhKiou73XickpGs81T37bLiEZd5dq8JxzGCSG8urBaeT9KkKmQCvLfl2rJ/WY7MHFR/Qu0jNOz2WqY8AxhUrONVvOjr/koXKfs3JlibjmgspXvvF8C6RyZ41kMt99V6nNa0bu4i25P2LY/IIRqeEuwP/49lq28e6+vb+op0ecxDpAmO+zDM=
