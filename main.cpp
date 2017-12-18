@@ -24,8 +24,6 @@ int main(int argc, char const *argv[])
         print_reverse_ip(ip_pool);
         printIpSequence(ip_pool, 1);
         printIpSequence(ip_pool, 46, 70);
-//        printOne(ip_pool);
-//        printFirstTwo(ip_pool);
         printAny(ip_pool, 46);
 
 

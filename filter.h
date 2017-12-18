@@ -77,7 +77,7 @@ void printIp(const Container &container) {
 }
 
 template <typename Container>
-auto _filterSequence(const Container& container, size_t idx) {
+auto _filterSequence(const Container& container, size_t) {
     return container;
 }
 
