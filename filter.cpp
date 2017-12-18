@@ -2,7 +2,7 @@
 #include <string>
 #include <tuple>
 
-std::vector<std::string> split(const std::__cxx11::string &str, char d)
+std::vector<std::string> split(const std::string &str, char d)
 {
     auto r = std::vector<std::string>();
 
