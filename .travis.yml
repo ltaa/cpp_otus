@@ -1,4 +1,5 @@
 language: cpp
+compuler: clang
 before_script:
 - sudo apt-get install libboost-test-dev -y
 - sudo apt-get install cmake
