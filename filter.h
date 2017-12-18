@@ -108,7 +108,7 @@ auto _filterSequence(const Container& container, size_t idx, T t, Args... args) 
         return false;
     });
 
-    auto r2 = _filterSequence(r, idx, args...);
+    auto r2 = _filterSequence(r, idx + 1, args...);
     return r2;
 
 

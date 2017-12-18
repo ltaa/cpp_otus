@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(printOne_test_case) {
 
     }
 
-    std::string expect = std::string("1.2.3.4\n")+
+    auto expect = std::string("1.2.3.4\n")+
             std::string("1.1.1.1\n") +
             std::string("1.33.213.44\n");
 
@@ -79,10 +79,17 @@ BOOST_AUTO_TEST_CASE(printFirstTwo_test_case) {
 
     }
 
-    std::string expect = std::string("1.2.3.4\n")+
+    auto expect = std::string("1.2.3.4\n")+
             std::string("1.2.1.1\n");
 
     printIpSequence(ip_pool,1,2);
+    BOOST_CHECK(output_stream.is_equal( expect));
+
+
+
+    expect = std::string("1.2.1.1\n");
+
+    printIpSequence(ip_pool,1,2,1);
     BOOST_CHECK(output_stream.is_equal( expect));
 }
 
@@ -112,7 +119,7 @@ BOOST_AUTO_TEST_CASE(printAny_test_case) {
 
     }
 
-    std::string expect = std::string("1.2.3.4\n") +
+    auto expect = std::string("1.2.3.4\n") +
             std::string("2.3.4.5\n") +
             std::string("2.3.5.7\n") +
             std::string("1.2.1.1\n");
