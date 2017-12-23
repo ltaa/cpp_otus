@@ -2,12 +2,10 @@ language: cpp
 compiler:
 - clang
 before_script:
-- sudo apt-get install libboost-test-dev -y
 - sudo apt-get install cmake
 script:
 - cmake .
 - cmake --build .
-- cmake --build . --target test
 - cmake --build . --target package
 deploy:
   provider: script
