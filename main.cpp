@@ -146,7 +146,8 @@ int main(int, char **)
     }
 
     log_allocator<std::pair<const int, int>> la(10);
-    std::map<int,int,std::less<const int>, log_allocator<std::pair<const int, int>>> m(la);
+    std::less<const int> less_object;
+    std::map<int,int,std::less<const int>, log_allocator<std::pair<const int, int>>> m(less_object, la);
     for(int i = 1; i <= 10; ++i) {
         if (!m.empty())
             m[i] = m[i-1] * i;
