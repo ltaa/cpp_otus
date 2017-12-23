@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.2)
 
-project(allocator)
+project(allocator VERSION 0.0.$ENV{TRAVIS_BUILD_NUM})
 add_executable(${PROJECT_NAME} "main.cpp")
 
 
@@ -10,3 +10,14 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     COMPILE_OPTIONS -Wall -Wextra -Wpedantic
 
     )
+
+
+install(TARGETS $PROJECT_NAME RUNTIME DESTINATION bin)
+
+
+set(CPACK_GENERATOR "DEB")
+set(CPACK_PACKAGE_VERSION_MAJOR 0)
+set(CPACK_PACKAGE_VERSION_MINOR 0)
+set(CPACK_PACKAGE_VERSION_PATCH 1)
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER shinobispb@gmail.com)
+include(CPack)
