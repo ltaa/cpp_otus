@@ -3,7 +3,7 @@
 #include <map>
 #include <functional>
 #include <cstddef>
-
+#include <type_traits>
 template <typename T>
 struct log_allocator {
     using value_type = T;
@@ -11,6 +11,7 @@ struct log_allocator {
     using pointer = T*;
     log_allocator() = default;
     log_allocator(size_t cap) : cap_(cap) {}
+
     pointer allocate(size_t num) {
         if(len_ != 0 && len_ < cap_) {
             ++len_;
@@ -29,6 +30,18 @@ struct log_allocator {
         return cur_ptr;
     }
 
+    template<typename T1>
+    struct rebind {
+        typedef log_allocator<T1> other;
+    };
+
+    log_allocator(const log_allocator&) = default;
+
+    template<typename T1>
+    log_allocator(const log_allocator<T1>& t) {
+        cap_ = t.cap_;
+    }
+
     void deallocate(T* ptr, size_t) {
         std::cout<<"calling deallocate"<<std::endl;
         if(len_ != 0)
@@ -41,9 +54,7 @@ struct log_allocator {
     template <typename U, typename... Args>
     void construct(U* ptr, Args&&... args) {
         std::cout<<"calling constructor"<<std::endl;
-//        ::new((void*) (ptr + len_ - 1)) U(std::forward<Args>(args)...);
         ::new((void*) (ptr)) U(std::forward<Args>(args)...);
-
     }
 
     template <typename U>
@@ -54,7 +65,6 @@ struct log_allocator {
     }
 
 
-private:
     size_t cap_ = 10;
     size_t len_ = 0;
     pointer cur_ptr;
@@ -115,6 +125,7 @@ private:
 int main(int, char **)
 {
 
+
     std::map<int,int> m_origin;
     for(int i = 1; i <= 10; ++i) {
         if (!m_origin.empty())
@@ -131,7 +142,8 @@ int main(int, char **)
 
     }
 
-    std::map<int,int,std::less<const int>, log_allocator<std::pair<int, int>>> m;
+    log_allocator<std::pair<const int, int>> la(10);
+    std::map<int,int,std::less<const int>, log_allocator<std::pair<const int, int>>> m(la);
     for(int i = 1; i <= 10; ++i) {
         if (!m.empty())
             m[i] = m[i-1] * i;
