@@ -21,7 +21,6 @@ struct log_allocator {
             return cur_ptr + len_ - 1;
         }
 
-        std::cout<<"calling allocate "<<num<<std::endl;
         auto ptr = std::malloc(cap_ * num * sizeof(T));
         if (ptr == nullptr) {
             throw std::bad_alloc();
@@ -46,23 +45,19 @@ struct log_allocator {
     }
 
     void deallocate(T* ptr, size_t) {
-        std::cout<<"calling deallocate"<<std::endl;
         if(len_ != 0)
             return;
 
-        std::cout<<"clean allocation"<<std::endl;
         delete ptr;
     }
 
     template <typename U, typename... Args>
     void construct(U* ptr, Args&&... args) {
-        std::cout<<"calling constructor"<<std::endl;
         ::new((void*) (ptr)) U(std::forward<Args>(args)...);
     }
 
     template <typename U>
     void destroy(U *ptr) {
-        std::cout<<"calling destructor"<<std::endl;
         --len_;
         ptr->~U();
     }
