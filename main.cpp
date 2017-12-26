@@ -81,15 +81,19 @@ struct Node {
 };
 
 
+//template <typename T, typename Alloc = std::allocator<T>>
 template <typename T, typename Alloc = std::allocator<Node<T>>>
+//template <typename T, class Alloc<Node<T>> >
 class List {
     using value_type = T;
     using alloc_type = Alloc;
     Node<T>* head = nullptr;
 
-
 public:
     List () = default;
+    template <template <class U> class _Alloc>
+    List(_Alloc<Node<T>> &a)  : alloc(a) {
+    }
     void push_back(const T& val ) {
 
         auto ptr = alloc.allocate(1);
@@ -125,8 +129,8 @@ int main(int, char **)
 
 
     std::map<int,int> m_origin;
-    for(int i = 1; i <= 10; ++i) {
-        if (!m_origin.empty())
+    for(int i = 0; i < 10; ++i) {
+        if (i != 0)
             m_origin[i] = m_origin[i-1] * i;
         else
             m_origin[i] = 1;
@@ -143,8 +147,8 @@ int main(int, char **)
     log_allocator<std::pair<const int, int>> la(10);
     std::less<const int> less_object;
     std::map<int,int,std::less<const int>, log_allocator<std::pair<const int, int>>> m(less_object, la);
-    for(int i = 1; i <= 10; ++i) {
-        if (!m.empty())
+    for(int i = 0; i < 10; ++i) {
+        if (i)
             m[i] = m[i-1] * i;
         else
             m[i] = 1;
@@ -165,6 +169,15 @@ int main(int, char **)
     }
 
     l.print();
+
+
+    log_allocator<Node<int>> ll(10);
+    List<int,log_allocator<Node<int>>> l_custom_alloc(ll);
+    for (int i = 0; i < 10; ++i) {
+        l_custom_alloc.push_back(i);
+    }
+
+    l_custom_alloc.print();
 
 
     return 0;
