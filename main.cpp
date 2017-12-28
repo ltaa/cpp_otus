@@ -137,22 +137,22 @@ class List {
 
 
 public:
-    List () : bdsm_obj(_Pair_alloc_type(Alloc())) {}
+    List () : ds_instance(_Pair_alloc_type(Alloc())) {}
     template <template <class U> class _Alloc>
-    List(_Alloc<T> &a)  : bdsm_obj(_Pair_alloc_type(a)) {
+    List(_Alloc<T> &a)  : ds_instance(_Pair_alloc_type(a)) {
     }
 
     void push_back(const T& val ) {
-        bdsm_obj.push_back(val);
+        ds_instance.push_back(val);
     }
 
 
     void print() {
-        bdsm_obj.print();
+        ds_instance.print();
     }
 
 private:
-    List_ds bdsm_obj;
+    List_ds ds_instance;
     size_t size_;
 
 };
