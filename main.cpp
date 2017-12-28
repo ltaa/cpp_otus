@@ -82,43 +82,77 @@ struct Node {
 
 
 //template <typename T, typename Alloc = std::allocator<T>>
-template <typename T, typename Alloc = std::allocator<Node<T>>>
+template <typename T, typename Alloc = std::allocator<T>>
 //template <typename T, class Alloc<Node<T>> >
 class List {
     using value_type = T;
+    using node_type = Node<T>;
     using alloc_type = Alloc;
-    Node<T>* head = nullptr;
+
+    template<typename _Alloc_type>
+    struct List_rep {
+        List_rep() = default;
+        List_rep(_Alloc_type &&a) : _a(a) {}
+
+        auto allocate(size_t l) {
+            return _a.allocate(l);
+        }
+
+        template <typename U, typename... Args>
+        void construct(U* ptr, Args&&... args) {
+            _a.construct(ptr, std::move(args)...);
+        }
+
+        void push_back(const T& val ) {
+            auto ptr = allocate(1);
+            construct(ptr, val);
+            if (head != nullptr) {
+                ptr->next = head;
+                head = ptr;
+            } else {
+                head = ptr;
+            }
+        }
+
+
+        void print() {
+            auto cur = head;
+            while(cur != nullptr) {
+                std::cout<<cur->value_<<" ";
+                cur = cur->next;
+            }
+            std::cout<<std::endl;
+        }
+
+        Node<T>* head = nullptr;
+        _Alloc_type _a;
+    };
+
+
+    using _Pair_alloc_type = typename __gnu_cxx::__alloc_traits<Alloc>::template
+    rebind<node_type>::other;
+
+    using List_ds = List_rep<_Pair_alloc_type>;
+
+
 
 public:
-    List () = default;
+    List () : bdsm_obj(_Pair_alloc_type(Alloc())) {}
     template <template <class U> class _Alloc>
-    List(_Alloc<Node<T>> &a)  : alloc(a) {
+    List(_Alloc<T> &a)  : bdsm_obj(_Pair_alloc_type(a)) {
     }
+
     void push_back(const T& val ) {
-
-        auto ptr = alloc.allocate(1);
-        alloc.construct(ptr, val);
-        if (head != nullptr) {
-            ptr->next = head;
-            head = ptr;
-        } else {
-            head = ptr;
-        }
-
-
+        bdsm_obj.push_back(val);
     }
+
 
     void print() {
-        auto cur = head;
-        while(cur != nullptr) {
-            std::cout<<cur->value_<<" ";
-            cur = cur->next;
-        }
-        std::cout<<std::endl;
+        bdsm_obj.print();
     }
 
 private:
-    alloc_type alloc;
+    List_ds bdsm_obj;
     size_t size_;
 
 };
@@ -171,8 +205,8 @@ int main(int, char **)
     l.print();
 
 
-    log_allocator<Node<int>> ll(10);
-    List<int,log_allocator<Node<int>>> l_custom_alloc(ll);
+    log_allocator<int> ll(10);
+    List<int,log_allocator<int>> l_custom_alloc(ll);
     for (int i = 0; i < 10; ++i) {
         l_custom_alloc.push_back(i);
     }
