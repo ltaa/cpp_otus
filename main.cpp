@@ -4,6 +4,21 @@
 #include <functional>
 #include <cstddef>
 #include <type_traits>
+#include <memory>
+#include <unordered_set>
+
+auto block_deleter = [] (auto ptr) {
+    free(static_cast<void*>(ptr));
+};
+
+
+
+
+//    void block_deleter(char* ptr) {
+//    //    free(static_cast<void*>(ptr));
+//    };
+
+
 template <typename T>
 struct log_allocator {
     using value_type = T;
@@ -13,7 +28,13 @@ struct log_allocator {
     using reference = T&;
     using const_reference = const T&;
     log_allocator() = default;
-    log_allocator(size_t cap) : cap_(cap) {}
+    log_allocator(size_t cap);
+
+//    void block_deleter(char* ptr) {
+//    //    free(static_cast<void*>(ptr));
+//    };
+
+    using block_sptr = std::shared_ptr<char>;
 
     pointer allocate(size_t num) {
         if(len_ != 0 && len_ < cap_) {
@@ -21,15 +42,24 @@ struct log_allocator {
             return cur_ptr + len_ - 1;
         }
 
-        auto ptr = std::malloc(cap_ * num * sizeof(T));
-        if (ptr == nullptr) {
+
+
+        auto u_ptr  = block_sptr (static_cast<char*>(std::malloc(cap_ * num * sizeof(T))),block_deleter);
+
+
+        if (u_ptr == nullptr) {
             throw std::bad_alloc();
         }
 
+        auto row_ptr = u_ptr.get();
+
+        data_.insert(u_ptr);
+
         len_ = 1;
-        cur_ptr = static_cast<T*> (ptr);
+        cur_ptr = reinterpret_cast<T*> (row_ptr);
 
         return cur_ptr;
+        //        return nullptr;
     }
 
     template<typename T1>
@@ -37,7 +67,20 @@ struct log_allocator {
         typedef log_allocator<T1> other;
     };
 
-    log_allocator(const log_allocator&) = default;
+    log_allocator(const log_allocator&src) = default;
+
+
+//    log_allocator(log_allocator &src) {
+//        cap_ = src.cap_;
+//        len_ = src.len_;
+//        cur_ptr = src.cur_ptr;
+//        data_ = std::move(src.data_);
+////        size_t cap_ = 10;
+////        size_t len_ = 0;
+////        pointer cur_ptr;
+////        std::unordered_set<block_sptr> data_;
+//    }
+////        = default;
 
     template<typename T1>
     log_allocator(const log_allocator<T1>& t) {
@@ -48,7 +91,7 @@ struct log_allocator {
         if(len_ != 0)
             return;
 
-        delete ptr;
+//        delete ptr;
     }
 
     template <typename U, typename... Args>
@@ -66,6 +109,7 @@ struct log_allocator {
     size_t cap_ = 10;
     size_t len_ = 0;
     pointer cur_ptr;
+    std::unordered_set<block_sptr> data_;
 
 };
 
@@ -124,6 +168,17 @@ class List {
             std::cout<<std::endl;
         }
 
+
+
+        ~List_rep() {
+            while (head != nullptr) {
+                auto ptr = head;
+                head = head->next;
+                _a.destroy(ptr);
+                _a.deallocate(ptr, sizeof (T));
+            }
+        }
+
         Node<T>* head = nullptr;
         _Alloc_type _a;
     };
@@ -150,6 +205,8 @@ public:
     void print() {
         ds_instance.print();
     }
+
+
 
 private:
     List_ds ds_instance;
@@ -216,3 +273,6 @@ int main(int, char **)
 
     return 0;
 }
+
+template<typename T>
+log_allocator<T>::log_allocator(size_t cap) : cap_(cap) {}
