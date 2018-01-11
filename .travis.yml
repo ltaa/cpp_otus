@@ -1,2 +1,2 @@
-before_script:
-- build.sh
+language: cpp
+before_script: sh build.sh
