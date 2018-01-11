@@ -4,6 +4,15 @@
 #include <functional>
 #include <cstddef>
 #include <type_traits>
+#include <memory>
+#include <unordered_set>
+
+auto block_deleter = [] (auto ptr) {
+    free(static_cast<void*>(ptr));
+};
+
+
+
 template <typename T>
 struct log_allocator {
     using value_type = T;
@@ -13,7 +22,9 @@ struct log_allocator {
     using reference = T&;
     using const_reference = const T&;
     log_allocator() = default;
-    log_allocator(size_t cap) : cap_(cap) {}
+    log_allocator(size_t cap);
+
+    using block_sptr = std::shared_ptr<char>;
 
     pointer allocate(size_t num) {
         if(len_ != 0 && len_ < cap_) {
@@ -21,15 +32,23 @@ struct log_allocator {
             return cur_ptr + len_ - 1;
         }
 
-        auto ptr = std::malloc(cap_ * num * sizeof(T));
-        if (ptr == nullptr) {
+
+        auto u_ptr  = block_sptr (static_cast<char*>(std::malloc(cap_ * num * sizeof(T))),block_deleter);
+
+
+        if (u_ptr == nullptr) {
             throw std::bad_alloc();
         }
 
+        auto row_ptr = u_ptr.get();
+
+        data_.insert(u_ptr);
+
         len_ = 1;
-        cur_ptr = static_cast<T*> (ptr);
+        cur_ptr = reinterpret_cast<T*> (row_ptr);
 
         return cur_ptr;
+        //        return nullptr;
     }
 
     template<typename T1>
@@ -37,18 +56,15 @@ struct log_allocator {
         typedef log_allocator<T1> other;
     };
 
-    log_allocator(const log_allocator&) = default;
+    log_allocator(const log_allocator&src) = default;
+
 
     template<typename T1>
     log_allocator(const log_allocator<T1>& t) {
         cap_ = t.cap_;
     }
 
-    void deallocate(T* ptr, size_t) {
-        if(len_ != 0)
-            return;
-
-        delete ptr;
+    void deallocate(T*, size_t) {
     }
 
     template <typename U, typename... Args>
@@ -66,6 +82,7 @@ struct log_allocator {
     size_t cap_ = 10;
     size_t len_ = 0;
     pointer cur_ptr;
+    std::unordered_set<block_sptr> data_;
 
 };
 
@@ -81,9 +98,7 @@ struct Node {
 };
 
 
-//template <typename T, typename Alloc = std::allocator<T>>
 template <typename T, typename Alloc = std::allocator<T>>
-//template <typename T, class Alloc<Node<T>> >
 class List {
     using value_type = T;
     using node_type = Node<T>;
@@ -124,6 +139,17 @@ class List {
             std::cout<<std::endl;
         }
 
+
+
+        ~List_rep() {
+            while (head != nullptr) {
+                auto ptr = head;
+                head = head->next;
+                _a.destroy(ptr);
+                _a.deallocate(ptr, sizeof (T));
+            }
+        }
+
         Node<T>* head = nullptr;
         _Alloc_type _a;
     };
@@ -151,6 +177,8 @@ public:
         ds_instance.print();
     }
 
+
+
 private:
     List_ds ds_instance;
     size_t size_;
@@ -158,44 +186,40 @@ private:
 };
 
 
+template <typename Container>
+void insertFactorial(Container &container, int val) {
+
+    for(int i = 0; i < val; ++i) {
+        if (i != 0)
+            container[i] = container[i-1] * i;
+        else
+            container[i] = 1;
+    }
+}
+
+template <typename Container>
+void printMap(const Container& container) {
+    for (auto &pair_val : container) {
+        int key = 0;
+        int val = 0;
+        std::tie(key, val) = pair_val;
+        std::cout<<key<<" "<<val<<std::endl;
+    }
+}
+
 int main(int, char **)
 {
 
 
     std::map<int,int> m_origin;
-    for(int i = 0; i < 10; ++i) {
-        if (i != 0)
-            m_origin[i] = m_origin[i-1] * i;
-        else
-            m_origin[i] = 1;
-    }
-
-    for (auto &m_val : m_origin) {
-        int key = 0;
-        int val = 0;
-        std::tie(key, val) = m_val;
-        std::cout<<key<<" "<<val<<std::endl;
-
-    }
+    insertFactorial(m_origin, 10);
+    printMap(m_origin);
 
     log_allocator<std::pair<const int, int>> la(10);
     std::less<const int> less_object;
     std::map<int,int,std::less<const int>, log_allocator<std::pair<const int, int>>> m(less_object, la);
-    for(int i = 0; i < 10; ++i) {
-        if (i)
-            m[i] = m[i-1] * i;
-        else
-            m[i] = 1;
-    }
-
-
-    for (auto &m_val : m) {
-        int key = 0;
-        int val = 0;
-        std::tie(key, val) = m_val;
-        std::cout<<key<<" "<<val<<std::endl;
-
-    }
+    insertFactorial(m, 10);
+    printMap(m);
 
     List<int> l;
     for (int i = 0; i < 10; ++i) {
@@ -216,3 +240,6 @@ int main(int, char **)
 
     return 0;
 }
+
+template<typename T>
+log_allocator<T>::log_allocator(size_t cap) : cap_(cap) {}
