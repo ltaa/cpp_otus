@@ -11,5 +11,6 @@ CHANGED_DIR=`dirname $DIRS`
 
 if [ "$CHANGED_DIR" != "." ]; then
 	cd $CHANGED_DIR
+	echo `pwd`
 
 fi 
