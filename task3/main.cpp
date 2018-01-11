@@ -12,7 +12,6 @@ auto block_deleter = [] (auto ptr) {
 };
 
 
-
 template <typename T>
 struct log_allocator {
     using value_type = T;
