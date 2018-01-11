@@ -1,2 +1,2 @@
 language: cpp
-script: sh build.sh
+before_script: cd ${CHANGED_DIR}
