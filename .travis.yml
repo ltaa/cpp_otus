@@ -1,2 +1,2 @@
 language: cpp
-before_script: cd ${CHANGED_DIR}
+before_script: cd task3
